@@ -34,13 +34,14 @@ void LtSgemmCustomFind(cublasLtHandle_t ltHandle,
                        int m,
                        int n,
                        int k,
-                       const float *alpha, /* host pointer */
-                       const float *A,
+                       const void *alpha, /* host pointer */
+                       const void *A,
                        int lda,
-                       const float *B,
+                       const void *B,
                        int ldb,
-                       const float *beta, /* host pointer */
-                       float *C,
+                       const void *beta, /* host pointer */
+                       void *C,
                        int ldc,
                        void *workSpace,
-                       size_t workSpaceSize);
+                       size_t workSpaceSize,
+                       int dtype);

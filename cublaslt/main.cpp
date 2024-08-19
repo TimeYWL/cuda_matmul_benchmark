@@ -34,32 +34,59 @@
 #include "sample_cublasLt_LtSgemmCustomFind.h"
 #include "helpers.h"
 
-int main() {
+int main()
+{
     int M = 512;
     int N = 4096;
     int K = 4096;
     float alpha = 1.0f;
     float beta = 0.0f;
-    TestBench<float> props(M, N, K, alpha, beta, 1024 * 1024 * 16);
+    int dtype = DTYPE_HALF;
 
-    props.run([&props] {
-        LtSgemmCustomFind(props.ltHandle,
-                        CUBLAS_OP_N,
-                        CUBLAS_OP_N,
-                        props.m,
-                        props.n,
-                        props.k,
-                        &props.alpha,
-                        props.Adev,
-                        props.m,
-                        props.Bdev,
-                        props.k,
-                        &props.beta,
-                        props.Cdev,
-                        props.m,
-                        props.workspace,
-                        props.workspaceSize);
-    });
+    if (dtype == DTYPE_FLOAT)
+    {
+        TestBench<float> props(M, N, K, alpha, beta, 1024 * 1024 * 4);
+        props.run([&props, dtype]
+                  { LtSgemmCustomFind(props.ltHandle,
+                                      CUBLAS_OP_N,
+                                      CUBLAS_OP_N,
+                                      props.m,
+                                      props.n,
+                                      props.k,
+                                      &props.alpha,
+                                      props.Adev,
+                                      props.m,
+                                      props.Bdev,
+                                      props.k,
+                                      &props.beta,
+                                      props.Cdev,
+                                      props.m,
+                                      props.workspace,
+                                      props.workspaceSize,
+                                      dtype); });
+    }
+    else if (dtype == DTYPE_HALF)
+    {
+        TestBench<__half> props(M, N, K, __half(alpha), __half(beta), 1024 * 1024 * 4);
+        props.run([&props, dtype]
+                  { LtSgemmCustomFind(props.ltHandle,
+                                      CUBLAS_OP_N,
+                                      CUBLAS_OP_N,
+                                      props.m,
+                                      props.n,
+                                      props.k,
+                                      &props.alpha,
+                                      props.Adev,
+                                      props.m,
+                                      props.Bdev,
+                                      props.k,
+                                      &props.beta,
+                                      props.Cdev,
+                                      props.m,
+                                      props.workspace,
+                                      props.workspaceSize,
+                                      dtype); });
+    }
 
     return 0;
 }

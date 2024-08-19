@@ -195,16 +195,17 @@ void LtSgemmCustomFind(cublasLtHandle_t ltHandle,
                       int m,
                       int n,
                       int k,
-                      const float *alpha, /* host pointer */
-                      const float *A,
+                      const void *alpha, /* host pointer */
+                      const void *A,
                       int lda,
-                      const float *B,
+                      const void *B,
                       int ldb,
-                      const float *beta, /* host pointer */
-                      float *C,
+                      const void *beta, /* host pointer */
+                      void *C,
                       int ldc,
                       void *workSpace,
-                      size_t workSpaceSize) {
+                      size_t workSpaceSize,
+                      int dtype) {
     cublasStatus_t status = CUBLAS_STATUS_SUCCESS;
     cublasLtMatmulDesc_t operationDesc = NULL;
     cublasLtMatrixLayout_t Adesc = NULL, Bdesc = NULL, Cdesc = NULL;
@@ -223,18 +224,23 @@ void LtSgemmCustomFind(cublasLtHandle_t ltHandle,
     int nbAlgoIds = 0;
     #define ALGO_IDS 4
     int algoIdA[ALGO_IDS];
+
     cudaDataType_t scaleType = CUDA_R_32F, Atype = CUDA_R_32F, Btype = CUDA_R_32F, Ctype = CUDA_R_32F;
     cublasComputeType_t computeType = CUBLAS_COMPUTE_32F;
+    if (dtype == DTYPE_HALF){
+        scaleType = CUDA_R_16F, Atype = CUDA_R_16F, Btype = CUDA_R_16F, Ctype = CUDA_R_16F;
+        computeType = CUBLAS_COMPUTE_16F;
+    }
     // create operation desciriptor; see cublasLtMatmulDescAttributes_t for details about defaults; here we just need to
     // set the transforms for A and B
-    checkCublasStatus(cublasLtMatmulDescCreate(&operationDesc, CUBLAS_COMPUTE_32F, CUDA_R_32F));
+    checkCublasStatus(cublasLtMatmulDescCreate(&operationDesc, computeType, Ctype));
     checkCublasStatus(cublasLtMatmulDescSetAttribute(operationDesc, CUBLASLT_MATMUL_DESC_TRANSA, &transa, sizeof(transa)));
     checkCublasStatus(cublasLtMatmulDescSetAttribute(operationDesc, CUBLASLT_MATMUL_DESC_TRANSB, &transb, sizeof(transb)));
 
     // create matrix descriptors, we are good with the details here so no need to set any extra attributes
-    checkCublasStatus(cublasLtMatrixLayoutCreate(&Adesc, CUDA_R_32F, transa == CUBLAS_OP_N ? m : k, transa == CUBLAS_OP_N ? k : m, lda));
-    checkCublasStatus(cublasLtMatrixLayoutCreate(&Bdesc, CUDA_R_32F, transb == CUBLAS_OP_N ? k : n, transb == CUBLAS_OP_N ? n : k, ldb));
-    checkCublasStatus(cublasLtMatrixLayoutCreate(&Cdesc, CUDA_R_32F, m, n, ldc));
+    checkCublasStatus(cublasLtMatrixLayoutCreate(&Adesc, Atype, transa == CUBLAS_OP_N ? m : k, transa == CUBLAS_OP_N ? k : m, lda));
+    checkCublasStatus(cublasLtMatrixLayoutCreate(&Bdesc, Btype, transb == CUBLAS_OP_N ? k : n, transb == CUBLAS_OP_N ? n : k, ldb));
+    checkCublasStatus(cublasLtMatrixLayoutCreate(&Cdesc, Ctype, m, n, ldc));
     
     // Request the 4 first AlgoId available for SGEMM ( computeType = scaleType = Atype = Btype = Ctype = Dtype = CUDA_R_32F)
     checkCublasStatus(cublasLtMatmulAlgoGetIds(ltHandle, computeType, scaleType, Atype, Btype, Ctype, Ctype, ALGO_IDS, algoIdA, &nbAlgoIds));

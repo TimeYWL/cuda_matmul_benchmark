@@ -11,4 +11,4 @@ make -j
 ./sample_cublasLt_LtSgemmCustomFind 
 ```
 
-可在 `main.cpp` 中更改矩阵乘的形状（M, N, K）
+可在 `main.cpp` 中更改矩阵乘的形状（M, N, K），以及数据类型（DTYPE_FLOAT 或 DTYPE_HALF），更改后需重新编译。

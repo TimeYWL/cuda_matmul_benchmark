@@ -37,6 +37,9 @@
 #include <cuda_fp8.h>
 #include <cuda_runtime_api.h>
 
+static int DTYPE_FLOAT = 0;
+static int DTYPE_HALF = 1;
+
 inline void checkCudaStatus(cudaError_t status) {
     if (status != cudaSuccess) {
         printf("cuda API failed with status %d: %s\n", status, cudaGetErrorString(status));
@@ -102,9 +105,9 @@ struct TestBench {
     }
 
     void fillData() {
-        for (int i = 0; i < m * k * N; i++) Ahost[i] = InType(i);
-        for (int i = 0; i < n * k * N; i++) Bhost[i] = InType(i);
-        for (int i = 0; i < m * N; i++) biasHost[i] = InType(i + 1);
+        for (int i = 0; i < m * k * N; i++) Ahost[i] = InType(float(i % 100));
+        for (int i = 0; i < n * k * N; i++) Bhost[i] = InType(float(i % 100));
+        for (int i = 0; i < m * N; i++) biasHost[i] = InType(float(i % 100));
     }
 
     void copyDataToDevice() {
