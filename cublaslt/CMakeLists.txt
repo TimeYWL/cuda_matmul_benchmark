@@ -37,3 +37,5 @@ target_link_libraries(${PROJECT_NAME}
     ${CUDART_LIBRARY}
     ${CUBLASLT_LIBRARY}
 )
+
+set_property(TARGET sample_cublasLt_LtSgemmCustomFind PROPERTY CUDA_ARCHITECTURES 80)
