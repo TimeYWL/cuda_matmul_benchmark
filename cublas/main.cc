@@ -4,6 +4,7 @@
 #include <vector>
 #include "simulator.h"
 #include "operator.h"
+#include "utils.h"
 
 int main(int argc, char* argv[]) {
 	std::vector<OpConfig> configVector;
@@ -39,7 +40,8 @@ int main(int argc, char* argv[]) {
 		/* transa = */ 0,
 		/* transb = */ 0,
 		/* tenser_op = */ 0,
-		/* algo   = */ -1
+		/* algo   = */ -1,
+		/* dtype*/ DTYPE_HALF
 	};
 
 	//configVector.push_back(conv2dConfig);

@@ -26,4 +26,7 @@ double get_durtime(struct timeval beg, struct timeval end);
 
 //void rand_gen_data(float* des, int num_of_elems);
 
+static int DTYPE_FLOAT = 0;
+static int DTYPE_HALF = 1;
+
 #endif

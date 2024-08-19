@@ -6,4 +6,4 @@ make #编译
 make clean #清理
 ```
 
-可在 `main.cc` 中更改矩阵乘的形状（M, N, K）
+可在 `main.cc` 中更改矩阵乘的形状（M, N, K），以及数据类型（DTYPE_FLOAT 或 DTYPE_HALF）。
