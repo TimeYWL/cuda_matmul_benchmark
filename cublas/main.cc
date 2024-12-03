@@ -31,8 +31,8 @@ int main(int argc, char* argv[]) {
 	OpConfig matMulConfig;
 	matMulConfig.opType = OpType::MATMUL;
 	int M = 512;
-	int N = 4096;
-	int K = 4096;
+	int N = 13824;
+	int K = 5120;
 	matMulConfig.args   = {
 		/* M = */ M,
 		/* N = */ N,

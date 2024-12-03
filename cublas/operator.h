@@ -2,7 +2,11 @@
 #define OPERATOR_H
 
 #include <string>
+#ifdef WITH_ROCM
+#include "miopen/miopen.h"
+#else
 #include "cudnn.h"
+#endif
 #include "simulator.h"
 
 using Signature = std::string;
@@ -32,7 +36,11 @@ public:
 
 private:
     OpConfig config;
+    #ifdef WITH_ROCM
+    miopenConvFwdAlgorithm_t algo;
+#else
     cudnnConvolutionFwdAlgo_t algo;
+#endif
 };
 
 // <======================================================>

@@ -1,7 +1,7 @@
 #include "utils.h"
 #include <sys/time.h>
 #include <ctime>
-#include <curand.h>
+// #include <curand.h>
 #include <cstdio>
 
 double get_durtime(struct timeval beg, struct timeval end) {

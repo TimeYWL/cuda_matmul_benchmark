@@ -8,11 +8,14 @@ void Simulator::initOp(std::vector<OpConfig> configVector) {
             pfMap[config] = PerformanceInfo();
             
             OpType opType = config.opType;
+#ifndef WITH_ROCM
             if (opType == OpType::CONV2D) {
                 // create a Conv2d operator
                 opVector.push_back(dynamic_cast<Operator*>(new Conv2d(config)));
             }
-            else if (opType == OpType::MATMUL) {
+            else 
+#endif
+            if (opType == OpType::MATMUL) {
                 // create a MatMul operator
 				opVector.push_back(dynamic_cast<Operator*>(new MatMul(config)));
             }
