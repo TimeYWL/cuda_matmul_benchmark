@@ -3,4 +3,4 @@ all:
 clean:
 	rm main
 rocm:
-	hipcc main.cc simulator.cc matmul.hip utils.cc -lrocblas -O3 -o main -std=c++11 -DWITH_ROCM 
+	hipcc main.cc simulator.cc matmul.hip utils.cc -lrocblas -O3 -o main -std=c++11 -DWITH_ROCM -DROCM_USE_FLOAT16

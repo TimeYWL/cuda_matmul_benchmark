@@ -54,11 +54,7 @@ void MatMul::performance_measuring(Simulator *simu, int rounds)
     if (dtype == DTYPE_HALF)
         dsize = sizeof(rocblas_half);
 
-    float alpha = 1.0, beta = 0.0;
-    rocblas_half alpha_half, beta_half;
-
-    float16(&(alpha_half.data), alpha);
-    float16(&(beta_half.data), beta);
+    rocblas_half alpha = 1.0, beta = 0.0;
 
     rocblas_handle handle;
     CUBLAS_CALL(rocblas_create_handle(&handle));
@@ -84,11 +80,11 @@ void MatMul::performance_measuring(Simulator *simu, int rounds)
     }else if (dtype == DTYPE_HALF)
     {
         for (int i = 0; i < max_size_a; i++)
-            float16(&(((rocblas_half *)A)[i].data), float(rand() % 5));
+            ((rocblas_half *)A)[i] = float(rand() % 5);
         for (int i = 0; i < max_size_b; i++)
-            float16(&(((rocblas_half *)B)[i].data), float(rand() % 5));
+            ((rocblas_half *)B)[i] = float(rand() % 5);
         for (int i = 0; i < max_size_c; i++)
-            float16(&(((rocblas_half *)C)[i].data), float(rand() % 5));
+            ((rocblas_half *)C)[i] = float(rand() % 5);
     }
     
 
@@ -157,6 +153,16 @@ void MatMul::performance_measuring(Simulator *simu, int rounds)
     hipEvent_t start, stop;
     CUDA_CALL(hipEventCreate(&start));
     CUDA_CALL(hipEventCreate(&stop));
+    
+    // warmup
+    for (int j = 0; j < 10; ++j){
+        CUBLAS_CALL(rocblas_gemm_ex(handle, transa, transb, M, N, K, &alpha,
+                                    devPtrA, rocblas_datatype_f16_r, lda,
+                                    devPtrB, rocblas_datatype_f16_r, ldb,
+                                    &beta, devPtrC, rocblas_datatype_f16_r, ldc, 
+                                    devPtrC, rocblas_datatype_f16_r, ldc, rocblas_datatype_f32_r,
+                                    algo, 0, 0));
+    }
 
     for (int i = 0; i < rounds; ++i)
     {
@@ -168,11 +174,11 @@ void MatMul::performance_measuring(Simulator *simu, int rounds)
         }
         else if (dtype == DTYPE_HALF)
         {
-            CUBLAS_CALL(rocblas_gemm_ex(handle, transa, transb, M, N, K, &alpha_half,
+            CUBLAS_CALL(rocblas_gemm_ex(handle, transa, transb, M, N, K, &alpha,
                                      devPtrA, rocblas_datatype_f16_r, lda,
                                      devPtrB, rocblas_datatype_f16_r, ldb,
-                                     &beta_half, devPtrC, rocblas_datatype_f16_r, ldc, 
-                                     devPtrC, rocblas_datatype_f16_r, ldc, rocblas_datatype_f16_r,
+                                     &beta, devPtrC, rocblas_datatype_f16_r, ldc, 
+                                     devPtrC, rocblas_datatype_f16_r, ldc, rocblas_datatype_f32_r,
                                      algo, 0, 0));
         }
 
@@ -180,6 +186,7 @@ void MatMul::performance_measuring(Simulator *simu, int rounds)
         CUDA_CALL(hipEventSynchronize(stop));
         CUDA_CALL(hipEventElapsedTime(&time, start, stop));
         avg_time += time;
+        std::cout<< "time: " << time << std::endl;
     }
     avg_time /= rounds;
 
