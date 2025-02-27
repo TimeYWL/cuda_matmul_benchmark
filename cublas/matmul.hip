@@ -54,7 +54,7 @@ void MatMul::performance_measuring(Simulator *simu, int rounds)
     if (dtype == DTYPE_HALF)
         dsize = sizeof(rocblas_half);
 
-    rocblas_half alpha = 1.0, beta = 0.0;
+    float alpha = 1.0, beta = 0.0;
 
     rocblas_handle handle;
     CUBLAS_CALL(rocblas_create_handle(&handle));
